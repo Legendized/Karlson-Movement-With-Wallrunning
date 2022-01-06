@@ -428,7 +428,7 @@ public class PlayerMovement : MonoBehaviour {
     private void StartWallRun(Vector3 normal)
     {
         MonoBehaviour.print("wallrunning");
-        //applies a force upwards and cancels all downwards momentum
+        //applies a force upwards
         if (!grounded && useWallrunning)
         {
             wallNormalVector = normal;
