@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour {
     public float slideCounterMovement = 0.2f;
     private bool readyToJump = true;
     private float jumpCooldown = 0.25f;
-    public float jumpForce = 550f;
+    public float jumpForce = 550f; //DO NOT LOWER JUMP FORCE, INSTEAD INCREASE GRAVITY. (default 550)
     float x, y;
     bool jumping;
     private Vector3 normalVector = Vector3.up;
