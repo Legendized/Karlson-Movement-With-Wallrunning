@@ -3,7 +3,8 @@
 using System;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour
+{
 
     [Header("Assignables")]
     public Transform playerCam;
@@ -15,7 +16,7 @@ public class PlayerMovement : MonoBehaviour {
     private float xRotation;
     public float sensitivity = 50f;
     private float sensMultiplier = 1.5f;
-    
+
     [Header("Movement")]
     public float moveSpeed = 4500;
     public float maxSpeed = 20;
@@ -39,6 +40,7 @@ public class PlayerMovement : MonoBehaviour {
     private Vector3 wallNormalVector;
     public float wallRunGravity = 1;
     private float wallRunRotation;
+    public float wallRunRotateAmount = 15f;
     public bool isWallRunning;
     public bool useWallrunning = true;
 
@@ -54,27 +56,31 @@ public class PlayerMovement : MonoBehaviour {
 
     public static PlayerMovement Instance { get; private set; }
 
-    void Awake() {
+    void Awake()
+    {
 
         Instance = this;
 
         rb = GetComponent<Rigidbody>();
     }
-    
-    void Start() {
-        playerScale =  transform.localScale;
+
+    void Start()
+    {
+        playerScale = transform.localScale;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         readyToJump = true;
         wallNormalVector = Vector3.up;
     }
 
-    
-    private void FixedUpdate() {
+
+    private void FixedUpdate()
+    {
         Movement();
     }
 
-    private void Update() {
+    private void Update()
+    {
         MyInput();
         Look();
     }
@@ -97,12 +103,13 @@ public class PlayerMovement : MonoBehaviour {
     /// <summary>
     /// Find user input. Should put this in its own class but im lazy
     /// </summary>
-    private void MyInput() {
+    private void MyInput()
+    {
         x = Input.GetAxisRaw("Horizontal");
         y = Input.GetAxisRaw("Vertical");
         jumping = Input.GetButton("Jump");
         crouching = Input.GetKey(KeyCode.LeftControl);
-      
+
         //Crouching
         if (Input.GetKeyDown(KeyCode.LeftControl))
             StartCrouch();
@@ -110,44 +117,50 @@ public class PlayerMovement : MonoBehaviour {
             StopCrouch();
     }
 
-    private void StartCrouch() {
+    private void StartCrouch()
+    {
         transform.localScale = crouchScale;
         transform.position = new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z);
-        if (rb.velocity.magnitude > 0.2f && grounded) {
-            if (grounded) {
+        if (rb.velocity.magnitude > 0.2f && grounded)
+        {
+            if (grounded)
+            {
                 rb.AddForce(orientation.transform.forward * slideForce);
             }
         }
     }
 
-    private void StopCrouch() {
+    private void StopCrouch()
+    {
         transform.localScale = playerScale;
         transform.position = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
     }
 
-    private void Movement() {
+    private void Movement()
+    {
         //Extra gravity
         rb.AddForce(Vector3.down * Time.deltaTime * 10);
-        
+
         //Find actual velocity relative to where player is looking
         Vector2 mag = FindVelRelativeToLook();
         float xMag = mag.x, yMag = mag.y;
 
         //Counteract sliding and sloppy movement
         CounterMovement(x, y, mag);
-        
+
         //If holding jump && ready to jump, then jump
         if (readyToJump && jumping) Jump();
 
         //Set max speed
         float maxSpeed = this.maxSpeed;
-        
+
         //If sliding down a ramp, add force down so player stays grounded and also builds speed
-        if (crouching && grounded && readyToJump) {
+        if (crouching && grounded && readyToJump)
+        {
             rb.AddForce(Vector3.down * Time.deltaTime * 3000);
             return;
         }
-        
+
         //If speed is larger than maxspeed, cancel out the input so you don't go over max speed
         if (x > 0 && xMag > maxSpeed) x = 0;
         if (x < 0 && xMag < -maxSpeed) x = 0;
@@ -156,13 +169,14 @@ public class PlayerMovement : MonoBehaviour {
 
         //Some multipliers
         float multiplier = 1f, multiplierV = 1f;
-        
+
         // Movement in air
-        if (!grounded) {
+        if (!grounded)
+        {
             multiplier = 0.5f;
             multiplierV = 0.5f;
         }
-        
+
         // Movement while sliding
         if (grounded && crouching) multiplierV = 0f;
 
@@ -200,19 +214,21 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    private void ResetJump() {
+    private void ResetJump()
+    {
         readyToJump = true;
     }
-    
+
     private float desiredX;
-    private void Look() {
+    private void Look()
+    {
         float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.fixedDeltaTime * sensMultiplier;
 
         //Find current look rotation
         Vector3 rot = playerCam.transform.localRotation.eulerAngles;
         desiredX = rot.y + mouseX;
-        
+
         //Rotate, and also make sure we dont over- or under-rotate.
         xRotation -= mouseY;
         float clamp = 89.5f;
@@ -223,25 +239,30 @@ public class PlayerMovement : MonoBehaviour {
         orientation.transform.localRotation = Quaternion.Euler(0, desiredX, 0);
     }
 
-    private void CounterMovement(float x, float y, Vector2 mag) {
+    private void CounterMovement(float x, float y, Vector2 mag)
+    {
         if (!grounded || jumping) return;
 
         //Slow down sliding
-        if (crouching) {
+        if (crouching)
+        {
             rb.AddForce(moveSpeed * Time.deltaTime * -rb.velocity.normalized * slideCounterMovement);
             return;
         }
 
         //Counter movement
-        if (Math.Abs(mag.x) > threshold && Math.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0)) {
+        if (Math.Abs(mag.x) > threshold && Math.Abs(x) < 0.05f || (mag.x < -threshold && x > 0) || (mag.x > threshold && x < 0))
+        {
             rb.AddForce(moveSpeed * orientation.transform.right * Time.deltaTime * -mag.x * counterMovement);
         }
-        if (Math.Abs(mag.y) > threshold && Math.Abs(y) < 0.05f || (mag.y < -threshold && y > 0) || (mag.y > threshold && y < 0)) {
+        if (Math.Abs(mag.y) > threshold && Math.Abs(y) < 0.05f || (mag.y < -threshold && y > 0) || (mag.y > threshold && y < 0))
+        {
             rb.AddForce(moveSpeed * orientation.transform.forward * Time.deltaTime * -mag.y * counterMovement);
         }
-        
+
         //Limit diagonal running. This will also cause a full stop if sliding fast and un-crouching, so not optimal.
-        if (Mathf.Sqrt((Mathf.Pow(rb.velocity.x, 2) + Mathf.Pow(rb.velocity.z, 2))) > maxSpeed) {
+        if (Mathf.Sqrt((Mathf.Pow(rb.velocity.x, 2) + Mathf.Pow(rb.velocity.z, 2))) > maxSpeed)
+        {
             float fallspeed = rb.velocity.y;
             Vector3 n = rb.velocity.normalized * maxSpeed;
             rb.velocity = new Vector3(n.x, fallspeed, n.z);
@@ -253,7 +274,8 @@ public class PlayerMovement : MonoBehaviour {
     /// Useful for vectors calculations regarding movement and limiting movement
     /// </summary>
     /// <returns></returns>
-    public Vector2 FindVelRelativeToLook() {
+    public Vector2 FindVelRelativeToLook()
+    {
         float lookAngle = orientation.transform.eulerAngles.y;
         float moveAngle = Mathf.Atan2(rb.velocity.x, rb.velocity.z) * Mathf.Rad2Deg;
 
@@ -263,12 +285,13 @@ public class PlayerMovement : MonoBehaviour {
         float magnitue = rb.velocity.magnitude;
         float yMag = magnitue * Mathf.Cos(u * Mathf.Deg2Rad);
         float xMag = magnitue * Mathf.Cos(v * Mathf.Deg2Rad);
-        
+
         return new Vector2(xMag, yMag);
     }
     //a lot of math (dont touch)
     private void FindWallRunRotation()
     {
+
         if (!isWallRunning)
         {
             wallRunRotation = 0f;
@@ -296,7 +319,7 @@ public class PlayerMovement : MonoBehaviour {
         }
         num = Vector3.SignedAngle(new Vector3(0f, 0f, 1f), wallNormalVector, Vector3.up);
         float num2 = Mathf.DeltaAngle(current, num);
-        wallRunRotation = (0f - num2 / 90f) * 15f;
+        wallRunRotation = (0f - num2 / 90f) * wallRunRotateAmount;
         if (!useWallrunning)
         {
             return;
