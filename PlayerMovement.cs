@@ -7,29 +7,40 @@ public class PlayerMovement : MonoBehaviour
 {
 
     [Header("Assignables")]
+    [Tooltip("this is a reference to the MainCamera object, not the parent of it.")]
     public Transform playerCam;
+    [Tooltip("reference to orientation object, needed for moving forward and not up or something.")]
     public Transform orientation;
+    [Tooltip("LayerMask for ground layer, important because otherwise the collision detection wont know what ground is")]
     public LayerMask whatIsGround;
     private Rigidbody rb;
 
     [Header("Rotation and look")]
     private float xRotation;
+    [Tooltip("mouse/look sensitivity")]
     public float sensitivity = 50f;
     private float sensMultiplier = 1.5f;
 
     [Header("Movement")]
+    [Tooltip("additive force amount. every physics update that forward is pressed, this force (multiplied by 1/tickrate) will be added to the player.")]
     public float moveSpeed = 4500;
+    [Tooltip("maximum local velocity before input is cancelled")]
     public float maxSpeed = 20;
+    [Tooltip("normal countermovement when not crouching.")]
     public float counterMovement = 0.175f;
     private float threshold = 0.01f;
+    [Tooltip("the maximum angle the ground can have relative to the players up direction.")]
     public float maxSlopeAngle = 35f;
     private Vector3 crouchScale = new Vector3(1, 0.5f, 1);
     private Vector3 playerScale;
+    [Tooltip("forward force for when a crouch is started.")]
     public float slideForce = 400;
+    [Tooltip("countermovement when sliding. this doesnt work the same way as normal countermovement.")]
     public float slideCounterMovement = 0.2f;
     private bool readyToJump = true;
     private float jumpCooldown = 0.25f;
-    public float jumpForce = 550f; //DO NOT LOWER JUMP FORCE, INSTEAD INCREASE GRAVITY. (default 550)
+    [Tooltip("this determines the jump force but is also applied when jumping off of walls, if you decrease it, you may end up being able to walljump and then get back onto the wall leading to infinite height.")]
+    public float jumpForce = 550f; 
     float x, y;
     bool jumping;
     private Vector3 normalVector = Vector3.up;
@@ -38,14 +49,24 @@ public class PlayerMovement : MonoBehaviour
     private float actualWallRotation;
     private float wallRotationVel;
     private Vector3 wallNormalVector;
+    [Tooltip("when wallrunning, an upwards force is constantly applied to negate gravity by about half (at default), increasing this value will lead to more upwards force and decreasing will lead to less upwards force.")]
     public float wallRunGravity = 1;
+    [Tooltip("when a wallrun is started, an upwards force is applied, this describes that force.")]
+    public float initialForce = 20f; 
+    [Tooltip("float to choose how much force is applied outwards when ending a wallrun. this should always be greater than Jump Force")]
+    public float escapeForce = 600f;
     private float wallRunRotation;
+    [Tooltip("how much you want to rotate the camera sideways while wallrunning")]
     public float wallRunRotateAmount = 15f;
+    [Tooltip("a bool to check if the player is wallrunning because thats kinda necessary.")]
     public bool isWallRunning;
+    [Tooltip("a bool to determine whether or not to actually allow wallrunning.")]
     public bool useWallrunning = true;
 
     [Header("Collisions")]
+    [Tooltip("a bool to check if the player is on the ground.")]
     public bool grounded;
+    [Tooltip("a bool to check if the player is currently crouching.")]
     public bool crouching;
     private bool surfing;
     private bool cancellingGrounded;
@@ -444,7 +465,7 @@ public class PlayerMovement : MonoBehaviour
         //for when we want to stop wallrunning
         MonoBehaviour.print("cancelled wallrun");
         Invoke("GetReadyToWallrun", 0.1f);
-        rb.AddForce(wallNormalVector * 600f);
+        rb.AddForce(wallNormalVector * escapeForce);
         useWallrunning = false;
     }
 
@@ -455,11 +476,10 @@ public class PlayerMovement : MonoBehaviour
         if (!grounded && useWallrunning)
         {
             wallNormalVector = normal;
-            float num = 20f;
             if (!isWallRunning)
             {
                 rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-                rb.AddForce(Vector3.up * num, ForceMode.Impulse);
+                rb.AddForce(Vector3.up * initialForce, ForceMode.Impulse);
             }
             isWallRunning = true;
         }
