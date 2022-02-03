@@ -378,7 +378,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool IsWall(Vector3 v)
     {
-        return Math.Abs(90f - Vector3.Angle(Vector3.up, v)) < 0.1f;
+        return Math.Abs(90f - Vector3.Angle(Vector3.up, v)) < 0.05f;
     }
 
     private bool IsRoof(Vector3 v)
