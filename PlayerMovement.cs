@@ -116,7 +116,7 @@ public class PlayerMovement : MonoBehaviour
     private void WallRunRotate()
     {
         FindWallRunRotation();
-        float num = 100f;
+        float num = 33f;
         actualWallRotation = Mathf.SmoothDamp(actualWallRotation, wallRunRotation, ref wallRotationVel, num * Time.deltaTime);
         playerCam.localRotation = Quaternion.Euler(playerCam.rotation.eulerAngles.x, playerCam.rotation.eulerAngles.y, actualWallRotation);
     }
