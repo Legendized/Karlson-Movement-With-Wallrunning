@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
     public float escapeForce = 600f;
     private float wallRunRotation;
     [Tooltip("how much you want to rotate the camera sideways while wallrunning")]
-    public float wallRunRotateAmount = 15f;
+    public float wallRunRotateAmount = 10f;
     [Tooltip("a bool to check if the player is wallrunning because thats kinda necessary.")]
     public bool isWallRunning;
     [Tooltip("a bool to determine whether or not to actually allow wallrunning.")]
@@ -116,7 +116,7 @@ public class PlayerMovement : MonoBehaviour
     private void WallRunRotate()
     {
         FindWallRunRotation();
-        float num = 33f;
+        float num = 12f;
         actualWallRotation = Mathf.SmoothDamp(actualWallRotation, wallRunRotation, ref wallRotationVel, num * Time.deltaTime);
         playerCam.localRotation = Quaternion.Euler(playerCam.rotation.eulerAngles.x, playerCam.rotation.eulerAngles.y, actualWallRotation);
     }
@@ -492,7 +492,7 @@ public class PlayerMovement : MonoBehaviour
         if (isWallRunning)
         {
             rb.AddForce(-wallNormalVector * Time.deltaTime * moveSpeed);
-            rb.AddForce(Vector3.up * Time.deltaTime * rb.mass * 40f * wallRunGravity);
+            rb.AddForce(Vector3.up * Time.deltaTime * rb.mass * 40f * wallRunGravity * -Physics.gravity.y);
         }
     }
 
