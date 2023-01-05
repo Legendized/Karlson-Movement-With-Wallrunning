@@ -83,6 +83,21 @@ public class PlayerMovement : MonoBehaviour
         Instance = this;
 
         rb = GetComponent<Rigidbody>();
+        
+        //Create a physic material with no friction to allow for wallrunning and smooth movement not being dependant
+        //and smooth movement not being dependant on the in-built unity physics engine, apart from collisions.
+        PhysicMaterial mat = new PhysicMaterial("tempMat");
+
+        mat.bounceCombine = PhysicMaterialCombine.Average;
+
+        mat.bounciness = 0;
+
+        mat.frictionCombine = PhysicMaterialCombine.Minimum;
+
+        mat.staticFriction = 0;
+        mat.dynamicFriction = 0;
+
+        gameObject.GetComponent<Collider>().material = mat;
     }
 
     void Start()
@@ -466,7 +481,7 @@ public class PlayerMovement : MonoBehaviour
         MonoBehaviour.print("cancelled wallrun");
         Invoke("GetReadyToWallrun", 0.1f);
         rb.AddForce(wallNormalVector * escapeForce);
-        useWallrunning = false;
+        isWallRunning = false;
     }
 
     private void StartWallRun(Vector3 normal)
