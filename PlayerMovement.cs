@@ -507,7 +507,7 @@ public class PlayerMovement : MonoBehaviour
         if (isWallRunning)
         {
             rb.AddForce(-wallNormalVector * Time.deltaTime * moveSpeed);
-            rb.AddForce(Vector3.up * Time.deltaTime * rb.mass * 40f * wallRunGravity * -Physics.gravity.y);
+            rb.AddForce(Vector3.up * Time.deltaTime * rb.mass * wallRunGravity * -Physics.gravity.y * 0.4f);
         }
     }
 
